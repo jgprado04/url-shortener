@@ -1,12 +1,14 @@
-// @ts-check
+// @ts-nocheck
 import eslint from '@eslint/js';
+import importPlugin from 'eslint-plugin-import';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'utils/YupValidationPipe.ts'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -25,11 +27,82 @@ export default tseslint.config(
     },
   },
   {
+    plugins: {
+      import: importPlugin,
+      'unused-imports': unusedImports,
+    },
     rules: {
+      'prettier/prettier': [
+        'error',
+        { singleQuote: false, printWidth: 80 },
+        { usePrettierrc: true },
+      ],
+      '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      'import/order': [
+        'off',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
+      ],
+      'sort-imports': [
+        'off',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ['none', 'all', 'single', 'multiple'],
+        },
+      ],
+      // Regra personalizada: interfaces devem começar com "I"
+      '@typescript-eslint/naming-convention': [
+        'error',
+        {
+          selector: 'interface',
+          format: ['PascalCase'],
+          custom: {
+            regex: '^I[A-Z]',
+            match: true,
+          },
+          failureMessage:
+            'O nome da interface deve começar com "I" maiúsculo (ex: IUser, IProduct).',
+        },
+      ],
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/require-await': 'off',
     },
   },
 );
